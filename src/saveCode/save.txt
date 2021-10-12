@@ -1,0 +1,57 @@
+import React, { useMemo } from 'react'
+import { useForm } from '../../hooks/useForm/useForm';
+import queryString from 'query-string';
+import { useLocation, useHistory } from 'react-router-dom';
+import { getHeroesByField } from '../../selectors/getHeroesByField';
+import { HeroCard } from '../heroes/HeroCard';
+
+type Inputs = {
+    search_field: string
+};
+export const SearchView = () => {
+    const location = useLocation();
+    const history = useHistory();
+
+    const  params  = queryString.parse(location.search);
+    
+    // const {formValues, handleInputChange} = useForm({
+    //     search_field: params?.q || ''
+    // });
+    // console.log(formValues)
+
+    const heroesFiltered = useMemo(() => getHeroesByField(params?.q?.toString()), [params?.q]);
+    
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        history.push(`?q=${formValues.search_field}`);
+    }
+
+    return (
+        <div className="container mx-auto p-5">
+            <form >
+                <div className="form-control">
+                    <div className="relative">
+                        <input type="text" placeholder="Search" autoComplete="off" name="search_field" className="w-full pr-16 input input-primary input-bordered" />
+                        <button className="absolute top-0 right-0 rounded-l-none btn btn-primary"><i className="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+            {
+                (params?.q === '') && (<div>
+                    Search a hero
+                </div>)
+            }
+             <div className="flex flex-wrap gap-2 mt-3">
+            {
+                heroesFiltered.map(hero => (
+                    <HeroCard key={hero.id} {...hero}/>
+                ))
+            }
+            </div>
+
+            
+                
+            
+        </div>
+    )
+}
